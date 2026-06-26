@@ -10,6 +10,10 @@ require "refurb_radar"
 class RefurbWatcherTest < Minitest::Test
   FIXTURES = File.expand_path("fixtures", __dir__)
   BASE_URL = "https://www.apple.com/ca/shop/refurbished/mac"
+  TEST_TWILIO_ACCOUNT_SID = "test-account-sid"
+  TEST_TWILIO_AUTH_TOKEN = "test-auth-token"
+  TEST_TWILIO_FROM = "twilio-from-test"
+  TEST_TWILIO_TO = "twilio-to-test"
 
   def test_cloudflare_access_allows_requests_when_unconfigured
     access = RefurbRadar::CloudflareAccess.new(env: {})
@@ -1827,10 +1831,10 @@ end
 
   def test_alerter_reports_configured_channel_keys
     env = {
-      "TWILIO_ACCOUNT_SID" => "AC123",
-      "TWILIO_AUTH_TOKEN" => "secret",
-      "TWILIO_FROM_NUMBER" => "+15555550100",
-      "REFURB_RADAR_ALERT_TO" => "+15555550123",
+      "TWILIO_ACCOUNT_SID" => TEST_TWILIO_ACCOUNT_SID,
+      "TWILIO_AUTH_TOKEN" => TEST_TWILIO_AUTH_TOKEN,
+      "TWILIO_FROM_NUMBER" => TEST_TWILIO_FROM,
+      "REFURB_RADAR_ALERT_TO" => TEST_TWILIO_TO,
       "REFURB_RADAR_TWILIO_SMS" => "1",
       "REFURB_RADAR_TWILIO_CALL" => "0"
     }
@@ -1845,11 +1849,11 @@ end
     err = StringIO.new
     candidate = parsed_candidates.first
     candidate.title = "Refurbished Mac mini Apple M4 Pro Chip with 14‑Core CPU and 20‑Core GPU, 10Gb Ethernet"
-    alert = RefurbRadar::TwilioSmsAlert.new(client: client, to: "+15555550123", err: err)
+    alert = RefurbRadar::TwilioSmsAlert.new(client: client, to: TEST_TWILIO_TO, err: err)
 
     assert alert.alert(candidate)
     body = client.sms_requests.first.fetch(:body)
-    assert_equal "+15555550123", client.sms_requests.first.fetch(:to)
+    assert_equal TEST_TWILIO_TO, client.sms_requests.first.fetch(:to)
     assert_includes body, candidate.part_number
     assert_includes body, "https://www.apple.com/ca/shop/product/#{candidate.part_number}"
     assert body.ascii_only?, "SMS body must stay GSM-7 friendly, got #{body.inspect}"
@@ -1861,7 +1865,7 @@ end
     client = FakeTwilioClient.new
     candidate = parsed_candidates.first
     candidate.alert_kind = "availability_signal"
-    alert = RefurbRadar::TwilioSmsAlert.new(client: client, to: "+15555550123", err: StringIO.new)
+    alert = RefurbRadar::TwilioSmsAlert.new(client: client, to: TEST_TWILIO_TO, err: StringIO.new)
 
     assert alert.alert(candidate)
     assert_includes client.sms_requests.first.fetch(:body), "Apple refurb availability signal:"
@@ -1871,10 +1875,10 @@ end
     client = FakeTwilioClient.new
     err = StringIO.new
     candidate = parsed_candidates.first
-    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: "+15555550123", err: err)
+    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: TEST_TWILIO_TO, err: err)
 
     assert alert.alert(candidate)
-    assert_equal "+15555550123", client.call_requests.first.fetch(:to)
+    assert_equal TEST_TWILIO_TO, client.call_requests.first.fetch(:to)
     assert_includes client.call_requests.first.fetch(:twiml), "Apple refurbished alert"
     assert_includes err.string, "twilio_call_started sid=CA123"
   end
@@ -1895,7 +1899,7 @@ end
       min_cpu_cores: 14,
       max_capacity_gb: 2048
     )
-    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: "+15555550123", criteria: criteria, err: StringIO.new)
+    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: TEST_TWILIO_TO, criteria: criteria, err: StringIO.new)
 
     receipt = alert.alert_with_receipt(candidate)
 
@@ -1921,7 +1925,7 @@ end
       min_cpu_cores: 14,
       max_capacity_gb: 2048
     )
-    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: "+15555550123", criteria: criteria, err: StringIO.new)
+    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: TEST_TWILIO_TO, criteria: criteria, err: StringIO.new)
 
     receipt = alert.alert_with_receipt(candidate)
 
@@ -1948,8 +1952,8 @@ end
     )
     alerter = RefurbRadar::Alerter.new(
       channels: [
-        RefurbRadar::TwilioSmsAlert.new(client: client, to: "+15555550123", err: StringIO.new),
-        RefurbRadar::TwilioCallAlert.new(client: client, to: "+15555550123", criteria: criteria, err: StringIO.new)
+        RefurbRadar::TwilioSmsAlert.new(client: client, to: TEST_TWILIO_TO, err: StringIO.new),
+        RefurbRadar::TwilioCallAlert.new(client: client, to: TEST_TWILIO_TO, criteria: criteria, err: StringIO.new)
       ]
     )
 
@@ -1978,7 +1982,7 @@ end
       min_cpu_cores: 14,
       max_capacity_gb: 2048
     )
-    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: "+15555550123", criteria: criteria, err: StringIO.new)
+    alert = RefurbRadar::TwilioCallAlert.new(client: client, to: TEST_TWILIO_TO, criteria: criteria, err: StringIO.new)
 
     assert alert.alert(candidate)
     assert_equal 1, client.call_requests.length
@@ -4125,7 +4129,7 @@ end
   class FakeTwilioClient
     attr_reader :sms_requests, :call_requests, :from, :messaging_service_sid
 
-    def initialize(from: "+15555550000", messaging_service_sid: nil)
+    def initialize(from: TEST_TWILIO_FROM, messaging_service_sid: nil)
       @from = from
       @messaging_service_sid = messaging_service_sid
       @sms_requests = []

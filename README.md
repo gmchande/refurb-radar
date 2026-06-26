@@ -24,7 +24,8 @@ buyable, and get the product page in front of a human quickly.
 - Builds a local catalog of known refurbished product variants.
 - Filters candidates through plain JSON target rules.
 - Confirms actionability from direct buyability evidence.
-- Opens the matching Apple product page and can send Twilio SMS or call alerts.
+- Opens the matching Apple product page locally; optional Twilio SMS/call alerts
+  can be enabled separately.
 - Serves a small WEBrick status and control page for the current watch rules.
 - Runs locally with launchd or on a small server with Kamal.
 
@@ -172,6 +173,9 @@ REFURB_RADAR_OPEN_COMMAND=/usr/bin/true bin/send-test-alert
 ```
 
 Optional Twilio alerts:
+
+Twilio is not required for the main local workflow. Leave these unset unless
+you explicitly want SMS or phone-call alerts in addition to browser-open.
 
 ```sh
 export TWILIO_ACCOUNT_SID=...

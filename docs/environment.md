@@ -7,7 +7,7 @@ Use exports in your shell, LaunchAgent plist, Kamal config, or another process
 manager:
 
 ```sh
-export REFURB_RADAR_OPEN=0
+export REFURB_RADAR_OPEN=1
 export REFURB_RADAR_BROWSER_ALERT=1
 export REFURB_RADAR_TARGETS=config/targets.json
 ```
@@ -40,7 +40,10 @@ export REFURB_RADAR_ALERT_COMMAND='afplay /System/Library/Sounds/Glass.aiff'
 export REFURB_RADAR_REMINDER_INTERVAL=300
 ```
 
-Twilio:
+Optional Twilio alerts:
+
+Twilio is off unless credentials are present and the channel flags below are
+set to `1`. Browser-open does not need Twilio.
 
 ```sh
 export TWILIO_ACCOUNT_SID=...

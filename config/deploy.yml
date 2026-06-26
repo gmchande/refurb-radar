@@ -50,7 +50,8 @@ env:
     # repo config/targets.json on first boot.
     REFURB_RADAR_TARGETS: /app/state/targets.json
     REFURB_RADAR_BROWSER_ALERT: "0"
-    REFURB_RADAR_TWILIO_SMS: "1"
+    # Optional: set these to "1" only when Twilio secrets are configured.
+    REFURB_RADAR_TWILIO_SMS: "0"
     REFURB_RADAR_TWILIO_CALL: "0"
   secret:
     - TWILIO_ACCOUNT_SID

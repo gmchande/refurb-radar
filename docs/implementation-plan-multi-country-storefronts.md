@@ -454,12 +454,16 @@ Work:
 4. Add a note that local browser opening works best for the user's own country,
    while cross-country alerts may still require country-specific checkout
    constraints.
-5. Status page should show a storefront badge in target cards and listings.
+5. Keep browser-open as the primary documented alert loop. Twilio SMS/calls are
+   optional, off by default, and must not require or include hardcoded phone
+   numbers in code, config, fixtures, or docs.
+6. Status page should show a storefront badge in target cards and listings.
 
 Acceptance:
 
 - A Canada-only user does not need to learn multi-country config.
 - A power user can configure `ca,us,jp` from docs alone.
+- A local user can run the main browser-open loop with no Twilio credentials.
 
 ## Test Plan
 
