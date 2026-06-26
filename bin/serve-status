@@ -1,0 +1,204 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
+
+Encoding.default_external = Encoding::UTF_8
+
+require "bundler/setup"
+require "webrick"
+require "refurb_radar"
+
+host = ENV.fetch("HOST", "127.0.0.1")
+port = ENV.fetch("PORT", "8127").to_i
+env = ->(key, default) { RefurbRadar.env_fetch(ENV, key, default) }
+base_path = env.call("REFURB_RADAR_STATUS_BASE_PATH", "/refurb-radar").sub(%r{/+\z}, "")
+state_path = env.call(
+  "REFURB_RADAR_STATE",
+  File.expand_path("../state/seen.json", __dir__)
+)
+catalog_path = env.call(
+  "REFURB_RADAR_CATALOG",
+  File.expand_path("../state/catalog.json", __dir__)
+)
+controls_path = env.call(
+  "REFURB_RADAR_CONTROLS",
+  File.expand_path("../state/controls.json", __dir__)
+)
+event_log_path = env.call(
+  "REFURB_RADAR_EVENTS",
+  File.expand_path("../state/events.jsonl", __dir__)
+)
+# Web-owned file: the worker owns seen/catalog/events, so test receipts get
+# their own file to avoid two processes writing the same JSON.
+test_receipt_path = env.call(
+  "REFURB_RADAR_TEST_RECEIPT",
+  File.expand_path("../state/test_receipt.json", __dir__)
+)
+targets_path = env.call("REFURB_RADAR_TARGETS", RefurbRadar::Matcher::DEFAULT_RULES_PATH)
+unless File.exist?(targets_path)
+  FileUtils.mkdir_p(File.dirname(targets_path))
+  FileUtils.cp(RefurbRadar::Matcher::DEFAULT_RULES_PATH, targets_path) if File.exist?(RefurbRadar::Matcher::DEFAULT_RULES_PATH)
+end
+
+control_store = RefurbRadar::ControlStore.new(controls_path)
+targets_store = RefurbRadar::TargetsStore.new(targets_path)
+page = RefurbRadar::StatusPage.new(
+  state_path: state_path,
+  catalog_path: catalog_path,
+  control_store: control_store,
+  event_log: RefurbRadar::EventLog.new(event_log_path),
+  test_receipt_path: test_receipt_path,
+  targets_path: targets_path,
+  base_path: base_path,
+  public_url: RefurbRadar.env_value(ENV, "REFURB_RADAR_STATUS_PUBLIC_URL")
+)
+access = RefurbRadar::CloudflareAccess.new
+
+# Constraint params arrive as form fields; empty string means "no constraint".
+# The worker re-reads the rules file every pass, so edits are live in a sweep.
+def rule_constraints(query)
+  {
+    "min_memory_gb" => query["memory"].to_s.empty? ? nil : query["memory"],
+    "max_memory_gb" => query["max_memory"].to_s.empty? ? nil : query["max_memory"],
+    "min_cpu_cores" => query["cores"].to_s.empty? ? nil : query["cores"],
+    "max_capacity_gb" => query["capacity"].to_s.empty? ? nil : query["capacity"],
+    "max_price" => query["price"].to_s.empty? ? nil : query["price"],
+    "screen_size_inches" => query["screen_size"].to_s.empty? ? nil : query["screen_size"],
+    "chip_family" => query["chip"].to_s.empty? ? nil : query["chip"]
+  }
+end
+
+def run_alert_test(receipt_path)
+  candidate = RefurbRadar::Candidate.new(
+    part_number: "TEST-APPLE-REFURB",
+    title: "Refurb Radar test alert with 14-Core CPU",
+    url: "https://www.apple.com/ca/shop/refurbished/mac",
+    model: "macstudio",
+    memory: "64gb",
+    capacity: "1tb",
+    commit_string: "test"
+  )
+  result = RefurbRadar::Alerter.from_env.alert_with_receipts(
+    candidate, channels: %w[twilio_sms twilio_call]
+  )
+  payload = {
+    "tested_at" => Time.now.utc.iso8601,
+    "receipts" => result.receipts.map do |receipt|
+      { "channel" => receipt.channel, "success" => receipt.success?, "error" => receipt.error }.compact
+    end
+  }
+  tmp_path = "#{receipt_path}.tmp"
+  File.write(tmp_path, JSON.pretty_generate(payload) + "\n", mode: "w:UTF-8")
+  File.rename(tmp_path, receipt_path)
+end
+
+# The page offers "both" as one choice; it means every phone channel.
+def alert_channels_for(value)
+  value == "both" ? %w[twilio_call twilio_sms] : [value]
+end
+
+# Translate a pause duration choice from the page into an absolute resume time.
+def paused_until_for(duration)
+  case duration
+  when "indefinite"
+    :indefinite
+  when "1h"
+    Time.now + 3600
+  when "tomorrow"
+    tomorrow = Time.now.localtime + 86_400
+    Time.new(tomorrow.year, tomorrow.month, tomorrow.day, 8, 0, 0, tomorrow.utc_offset)
+  else
+    Time.now + 1800
+  end
+end
+
+def public_status_path?(path, base_path)
+  path == "/up" || path == "#{base_path}/up" || path == "/favicon.ico"
+end
+
+def cloudflare_access_blocked?(access, request, response)
+  if access.valid_request?(request.header)
+    false
+  else
+    response.status = 401
+    response["Content-Type"] = "text/plain; charset=utf-8"
+    response.body = "Cloudflare Access required\n"
+    response.body = "" if request.request_method == "HEAD"
+    true
+  end
+end
+
+server = WEBrick::HTTPServer.new(
+  BindAddress: host,
+  Port: port,
+  AccessLog: [],
+  Logger: WEBrick::Log.new($stderr, WEBrick::Log::WARN)
+)
+
+server.mount_proc("/") do |request, response|
+  path = request.path.sub(%r{/+\z}, "")
+  post = request.request_method == "POST"
+  next if !public_status_path?(path, base_path) && cloudflare_access_blocked?(access, request, response)
+
+  case path
+  when "", base_path
+    response.status = 200
+    response["Content-Type"] = "text/html; charset=utf-8"
+    response.body = page.render
+  when "#{base_path}/controls/pause", "/controls/pause"
+    if post
+      paused_until = paused_until_for(request.query["duration"])
+      alert_channels_for(request.query["channel"]).each do |channel|
+        control_store.pause(channel, paused_until: paused_until)
+      end
+    end
+    response.status = 303
+    response["Location"] = base_path.empty? ? "/" : base_path
+  when "#{base_path}/controls/resume", "/controls/resume"
+    alert_channels_for(request.query["channel"]).each { |channel| control_store.resume(channel) } if post
+    response.status = 303
+    response["Location"] = base_path.empty? ? "/" : base_path
+  when "#{base_path}/controls/test", "/controls/test"
+    run_alert_test(test_receipt_path) if post
+    response.status = 303
+    response["Location"] = base_path.empty? ? "/" : base_path
+  when "#{base_path}/rules/add", "/rules/add"
+    targets_store.add(request.query["model"]) if post
+    response.status = 303
+    response["Location"] = base_path.empty? ? "/" : base_path
+  when "#{base_path}/rules/update", "/rules/update"
+    targets_store.update(request.query["index"], rule_constraints(request.query)) if post
+    response.status = 303
+    response["Location"] = base_path.empty? ? "/" : base_path
+  when "#{base_path}/rules/remove", "/rules/remove"
+    targets_store.remove(request.query["index"]) if post
+    response.status = 303
+    response["Location"] = base_path.empty? ? "/" : base_path
+  when "/up", "#{base_path}/up"
+    response.status = 200
+    response["Content-Type"] = "text/plain; charset=utf-8"
+    response.body = "ok\n"
+  when "/favicon.ico"
+    response.status = 204
+    response.body = ""
+  else
+    response.status = 404
+    response["Content-Type"] = "text/plain; charset=utf-8"
+    response.body = "not found\n"
+  end
+
+  response.body = "" if request.request_method == "HEAD"
+rescue ArgumentError, KeyError => error
+  response.status = 400
+  response["Content-Type"] = "text/plain; charset=utf-8"
+  response.body = "bad request: #{error.message}\n"
+end
+
+%w[INT TERM].each do |signal|
+  Signal.trap(signal) { server.shutdown }
+rescue ArgumentError
+  next
+end
+
+server.start

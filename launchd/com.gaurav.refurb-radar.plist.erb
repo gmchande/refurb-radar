@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.gaurav.refurb-radar</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string><%= ruby_path %></string>
+    <string><%= watch_path %></string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string><%= repo_root %></string>
+
+  <key>RunAtLoad</key>
+  <true/>
+
+  <key>KeepAlive</key>
+  <true/>
+
+  <key>StandardOutPath</key>
+  <string><%= log_path %></string>
+
+  <key>StandardErrorPath</key>
+  <string><%= error_log_path %></string>
+</dict>
+</plist>

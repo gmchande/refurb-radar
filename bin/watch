@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
+
+# launchd starts us with no LANG, which makes Ruby default to US-ASCII and
+# break on Apple's non-ASCII product titles.
+Encoding.default_external = Encoding::UTF_8
+
+require "refurb_radar"
+
+$stdout.sync = true
+$stderr.sync = true
+
+env = ->(key, default) { RefurbRadar.env_fetch(ENV, key, default) }
+
+state_path = env.call(
+  "REFURB_RADAR_STATE",
+  File.expand_path("../state/seen.json", __dir__)
+)
+catalog_path = env.call(
+  "REFURB_RADAR_CATALOG",
+  File.expand_path("../state/catalog.json", __dir__)
+)
+event_log_path = env.call(
+  "REFURB_RADAR_EVENTS",
+  File.expand_path("../state/events.jsonl", __dir__)
+)
+controls_path = env.call(
+  "REFURB_RADAR_CONTROLS",
+  File.expand_path("../state/controls.json", __dir__)
+)
+targets_path = env.call("REFURB_RADAR_TARGETS", RefurbRadar::Matcher::DEFAULT_RULES_PATH)
+unless File.exist?(targets_path)
+  FileUtils.mkdir_p(File.dirname(targets_path))
+  FileUtils.cp(RefurbRadar::Matcher::DEFAULT_RULES_PATH, targets_path) if File.exist?(RefurbRadar::Matcher::DEFAULT_RULES_PATH)
+end
+grid_url = env.call("REFURB_RADAR_GRID_URL", RefurbRadar::DEFAULT_GRID_URL)
+session = RefurbRadar::StoreSession.new(grid_url: grid_url)
+catalog_refresh = RefurbRadar::CatalogRefresh.new(
+  grid_url: grid_url,
+  seed_urls: RefurbRadar::Config.seed_urls,
+  fetcher: session,
+  store: RefurbRadar::CatalogStore.new(catalog_path)
+)
+
+check = RefurbRadar::Check.new(
+  grid_url: grid_url,
+  fetcher: session,
+  matcher: -> { RefurbRadar::Matcher.from_env },
+  buyability_client: RefurbRadar::BuyabilityClient.new(
+    endpoint: RefurbRadar::BuyabilityEndpoint.new(
+      base_url: env.call("REFURB_RADAR_BUYABILITY_URL", RefurbRadar::DEFAULT_BUYABILITY_URL)
+    ),
+    fetcher: session
+  ),
+  state_store: RefurbRadar::StateStore.new(state_path),
+  catalog_store: RefurbRadar::CatalogStore.new(catalog_path),
+  control_store: RefurbRadar::ControlStore.new(controls_path),
+  event_log: RefurbRadar::EventLog.new(event_log_path),
+  alerter: RefurbRadar::Alerter.from_env,
+  watch_candidates: -> { RefurbRadar::Config.watch_candidates(catalog_path: catalog_path) },
+  open_matches: env.call("REFURB_RADAR_OPEN", "1") != "0",
+  include_grid: env.call("REFURB_RADAR_GRID_ON_FAST_PATH", "1") != "0",
+  fetch_threads: env.call("REFURB_RADAR_FETCH_THREADS", "6").to_i,
+  reminder_interval_seconds: env.call("REFURB_RADAR_REMINDER_INTERVAL", "300").to_i,
+  call_interval_seconds: env.call("REFURB_RADAR_CALL_INTERVAL", "600").to_i
+)
+
+max_checks = RefurbRadar.env_value(ENV, "REFURB_RADAR_MAX_CHECKS")&.to_i
+RefurbRadar::Watch.new(
+  check: check,
+  max_checks: max_checks&.positive? ? max_checks : nil,
+  sleep_range: 8..13,
+  catalog_refresh: catalog_refresh,
+  catalog_refresh_interval: env.call("REFURB_RADAR_CATALOG_REFRESH_INTERVAL", "1800").to_i
+).run

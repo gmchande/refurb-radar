@@ -1,0 +1,24 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
+
+require "refurb_radar"
+
+candidate = RefurbRadar::Candidate.new(
+  part_number: "TEST-APPLE-REFURB",
+  title: "Refurb Radar test alert with 14-Core CPU",
+  url: "https://www.apple.com/ca/shop/refurbished/mac",
+  model: "macstudio",
+  memory: "64gb",
+  capacity: "1tb",
+  price: nil,
+  commit_string: "test"
+)
+
+unless RefurbRadar::Alerter.from_env.alert(candidate)
+  warn "error=no_alert_channel_succeeded"
+  exit 1
+end
+
+puts "test_alert_sent part=#{candidate.part_number}"

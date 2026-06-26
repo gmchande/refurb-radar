@@ -1,0 +1,38 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift(File.expand_path("../lib", __dir__))
+
+require "refurb_radar"
+
+begin
+  env = ->(key, default) { RefurbRadar.env_fetch(ENV, key, default) }
+  catalog_path = env.call(
+    "REFURB_RADAR_CATALOG",
+    File.expand_path("../state/catalog.json", __dir__)
+  )
+
+  refresh = RefurbRadar::CatalogRefresh.new(
+    grid_url: env.call("REFURB_RADAR_GRID_URL", RefurbRadar::DEFAULT_GRID_URL),
+    seed_urls: RefurbRadar::Config.seed_urls,
+    matcher: RefurbRadar::Matcher.from_env,
+    store: RefurbRadar::CatalogStore.new(catalog_path)
+  )
+
+  result = refresh.run
+  products = result.catalog.fetch("products", [])
+  puts [
+    "checked_at=#{result.checked_at.iso8601}",
+    "discovered_candidates=#{result.discovered_candidates.length}",
+    "catalog_products=#{products.length}",
+    "warnings=#{result.warnings.length}"
+  ].join(" ")
+  products.each do |product|
+    puts "catalog part=#{product.fetch("part_number")} model=#{product.fetch("model")} memory=#{product.fetch("memory")} capacity=#{product.fetch("capacity")} url=#{product.fetch("url")}"
+  end
+  result.warnings.each { |warning| puts "warning=#{warning}" }
+  exit 0
+rescue RefurbRadar::Error => error
+  warn "error=#{error.class}: #{error.message}"
+  exit 1
+end

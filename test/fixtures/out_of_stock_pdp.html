@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+  <head>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "offers": [
+          {
+            "@type": "Offer",
+            "availability": "http://schema.org/OutOfStock",
+            "sku": "GSTUDIO96/A"
+          }
+        ]
+      }
+    </script>
+  </head>
+  <body>
+    <form>
+      <button type="submit" class="button button-block disabled" name="add-to-cart" value="add-to-cart" disabled="disabled" data-autom="add-to-cart">
+        Add to Bag
+      </button>
+    </form>
+    <script>
+      window.pageLevelData = {
+        "buyNowButton": {
+          "disabled": true,
+          "text": "Add to Bag"
+        },
+        "buyable": false,
+        "isBuyable": false,
+        "buyFlowForm": {
+          "omnitureData": {
+            "customerCommitString": "Out of stock"
+          }
+        }
+      };
+    </script>
+  </body>
+</html>

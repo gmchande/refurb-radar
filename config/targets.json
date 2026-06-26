@@ -1,0 +1,31 @@
+{
+  "rules": [
+    {
+      "models": ["macmini"],
+      "min_memory_gb": 64,
+      "min_cpu_cores": 14,
+      "max_capacity_gb": 4096
+    },
+    {
+      "models": ["macstudio"],
+      "min_memory_gb": 64,
+      "min_cpu_cores": 14,
+      "max_capacity_gb": 4096
+    },
+    {
+      "models": ["macbookair"],
+      "screen_size_inches": 13,
+      "chip_family": "m5"
+    },
+    {
+      "models": ["macbookpro"],
+      "screen_size_inches": 14,
+      "chip_family": "m5",
+      "min_memory_gb": 24,
+      "max_capacity_gb": 512
+    },
+    {
+      "models": ["visionpro"]
+    }
+  ]
+}

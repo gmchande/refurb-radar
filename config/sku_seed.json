@@ -1,0 +1,190 @@
+{
+  "updated_at": "2026-06-10T00:00:00Z",
+  "products": [
+    {
+      "part_number": "G1CD0LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "48gb",
+      "capacity": "512gb",
+      "price": "2929.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CD1LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "64gb",
+      "capacity": "512gb",
+      "price": "3179.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CD2LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "128gb",
+      "capacity": "512gb",
+      "price": "4199.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CD4LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "48gb",
+      "capacity": "1tb",
+      "price": "3179.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CD5LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "64gb",
+      "capacity": "1tb",
+      "price": "3439.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CD6LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "128gb",
+      "capacity": "1tb",
+      "price": "4459.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CD8LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "48gb",
+      "capacity": "2tb",
+      "price": "3689.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CD9LL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "64gb",
+      "capacity": "2tb",
+      "price": "3949.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CDALL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "128gb",
+      "capacity": "2tb",
+      "price": "4969.00",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1CDELL/A",
+      "title": "Refurbished Mac Studio Apple M4 Max chip with 16-Core CPU and 40-Core GPU",
+      "model": "macstudio",
+      "memory": "128gb",
+      "capacity": "4tb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1JV2LL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 12-Core CPU and 16-Core GPU, Gigabit Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "512gb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1JV3LL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 12-Core CPU and 16-Core GPU, Gigabit Ethernet",
+      "model": "macmini",
+      "memory": "64gb",
+      "capacity": "512gb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1JV4LL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 12-Core CPU and 16-Core GPU, 10Gb Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "512gb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1JV7LL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 12-Core CPU and 16-Core GPU, Gigabit Ethernet",
+      "model": "macmini",
+      "memory": "64gb",
+      "capacity": "1tb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1JV8LL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 12-Core CPU and 16-Core GPU, 10Gb Ethernet",
+      "model": "macmini",
+      "memory": "64gb",
+      "capacity": "1tb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1JVELL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 12-Core CPU and 16-Core GPU, Gigabit Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "512gb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1JVLLL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 12-Core CPU and 16-Core GPU, 10Gb Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "1tb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1KZCLL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 14-Core CPU and 20-Core GPU, Gigabit Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "512gb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1KZDLL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 14-Core CPU and 20-Core GPU, 10Gb Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "512gb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1KZELL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 14-Core CPU and 20-Core GPU, Gigabit Ethernet",
+      "model": "macmini",
+      "memory": "64gb",
+      "capacity": "512gb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1KZLLL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 14-Core CPU and 20-Core GPU, Gigabit Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "1tb",
+      "source": "seed"
+    },
+    {
+      "part_number": "G1KZNLL/A",
+      "title": "Refurbished Mac mini Apple M4 Pro Chip with 14-Core CPU and 20-Core GPU, 10Gb Ethernet",
+      "model": "macmini",
+      "memory": "48gb",
+      "capacity": "1tb",
+      "source": "seed"
+    }
+  ]
+}

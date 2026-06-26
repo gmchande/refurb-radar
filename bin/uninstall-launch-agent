@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "fileutils"
+
+plist_path = File.expand_path("~/Library/LaunchAgents/com.gaurav.refurb-radar.plist")
+uid = Process.uid
+
+system("launchctl", "bootout", "gui/#{uid}", plist_path, out: File::NULL, err: File::NULL)
+system("launchctl", "unload", plist_path, out: File::NULL, err: File::NULL)
+FileUtils.rm_f(plist_path)
+
+puts "removed #{plist_path}"

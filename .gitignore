@@ -1,0 +1,13 @@
+log/*.log
+state/*.json
+state/*.jsonl
+state/*.lock
+.env
+.scratch/
+.tmp
+.claude/
+.ruby-lsp/
+.kamal/secrets
+config/deploy.production.yml
+.playwright-mcp/
+/apple-refurb-status-*.png

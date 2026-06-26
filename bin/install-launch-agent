@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "erb"
+require "etc"
+require "fileutils"
+require "rbconfig"
+
+repo_root = File.expand_path("..", __dir__)
+template_path = File.join(repo_root, "launchd/com.gaurav.refurb-radar.plist.erb")
+plist_dir = File.expand_path("~/Library/LaunchAgents")
+plist_path = File.join(plist_dir, "com.gaurav.refurb-radar.plist")
+ruby_path = Dir.chdir(repo_root) { `rbenv which ruby 2>/dev/null`.strip }
+ruby_path = RbConfig.ruby if ruby_path.empty?
+watch_path = File.join(repo_root, "bin/watch")
+log_path = File.join(repo_root, "log/watcher.log")
+error_log_path = File.join(repo_root, "log/watcher.err.log")
+uid = Process.uid
+
+FileUtils.mkdir_p(plist_dir)
+FileUtils.mkdir_p(File.join(repo_root, "log"))
+template = ERB.new(File.read(template_path), trim_mode: "-")
+File.write(plist_path, template.result(binding))
+
+system("launchctl", "bootout", "gui/#{uid}", plist_path, out: File::NULL, err: File::NULL)
+loaded = system("launchctl", "bootstrap", "gui/#{uid}", plist_path)
+loaded ||= system("launchctl", "load", plist_path)
+abort "failed to load #{plist_path}" unless loaded
+
+puts "installed #{plist_path}"

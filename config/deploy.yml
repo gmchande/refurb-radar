@@ -1,0 +1,73 @@
+service: refurb_radar
+
+primary_role: web
+
+image: your-dockerhub-user/refurb-radar
+
+servers:
+  web:
+    hosts:
+      - 203.0.113.10
+    cmd: bundle exec ruby bin/serve-status
+  worker:
+    hosts:
+      - 203.0.113.10
+    cmd: bundle exec ruby bin/watch
+    proxy: false
+
+ssh:
+  user: root
+  keys_only: true
+  keys:
+    - ~/.ssh/refurb_radar_deploy
+  config: false
+
+proxy:
+  ssl: false
+  host: example.com
+  app_port: 8127
+  path_prefix: /refurb-radar
+  strip_path_prefix: false
+  healthcheck:
+    path: /up
+
+registry:
+  username: your-dockerhub-user
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+env:
+  clear:
+    TZ: America/Toronto
+    HOST: 0.0.0.0
+    PORT: "8127"
+    REFURB_RADAR_STATUS_BASE_PATH: /refurb-radar
+    REFURB_RADAR_STATUS_PUBLIC_URL: https://example.com/refurb-radar/
+    CLOUDFLARE_ACCESS_TEAM_DOMAIN: your-team.cloudflareaccess.com
+    CLOUDFLARE_ACCESS_AUD: your-cloudflare-access-audience
+    # Live criteria in the shared volume: editable from the status page,
+    # re-read by the worker every pass, survives deploys. Seeded from the
+    # repo config/targets.json on first boot.
+    REFURB_RADAR_TARGETS: /app/state/targets.json
+    REFURB_RADAR_BROWSER_ALERT: "0"
+    REFURB_RADAR_TWILIO_SMS: "1"
+    REFURB_RADAR_TWILIO_CALL: "0"
+  secret:
+    - TWILIO_ACCOUNT_SID
+    - TWILIO_AUTH_TOKEN
+    - TWILIO_FROM_NUMBER
+    - REFURB_RADAR_ALERT_TO
+
+volumes:
+  - /srv/refurb-radar/state:/app/state
+  - /srv/refurb-radar/log:/app/log
+
+builder:
+  arch: amd64
+
+aliases:
+  logs: app logs -f
+  shell: app exec --interactive --reuse --roles worker "bash"
+  check: app exec --reuse --roles worker "env REFURB_RADAR_OPEN=0 ruby bin/check-once"
+  refresh: app exec --reuse --roles worker "ruby bin/refresh-catalog"
+  test-alert: app exec --reuse --roles worker "ruby bin/send-test-alert"

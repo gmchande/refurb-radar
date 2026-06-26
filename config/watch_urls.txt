@@ -1,0 +1,3 @@
+# Seed product pages to poll directly and expand into sibling SKU catalog entries.
+https://www.apple.com/ca/shop/product/g1cd5ll/a/Refurbished-Mac-Studio-Apple-M4-Max-chip-with-16%E2%80%91Core-CPU-and-40%E2%80%91Core-GPU?fnode=657b2b1e4d1bf61e356c1e9fdb34f3b155bb2b42384361fa0918fb74878db2c7ac0be1e8d3a4eef4cda0f1c4733feeac60721b558b6067d6ed36fba3d6342ded143a0114b1f33f6d1d3cfde9cb5c11da
+https://www.apple.com/ca/shop/product/G1JVELL/A

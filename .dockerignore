@@ -1,0 +1,7 @@
+.git
+.kamal/secrets
+log/*
+!log/.gitkeep
+state/*
+!state/.gitkeep
+tmp

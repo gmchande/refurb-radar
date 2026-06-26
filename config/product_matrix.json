@@ -1,0 +1,120 @@
+{
+  "sources": [
+    {
+      "id": "mac_studio_2022_support",
+      "url": "https://support.apple.com/en-us/111900",
+      "note": "Mac Studio 2022 launch/technical configuration options."
+    },
+    {
+      "id": "mac_studio_2023_support",
+      "url": "https://support.apple.com/en-us/111835",
+      "note": "Mac Studio 2023 launch/technical configuration options."
+    },
+    {
+      "id": "mac_studio_2025_support",
+      "url": "https://support.apple.com/en-us/122211",
+      "note": "Mac Studio 2025 technical configuration options."
+    },
+    {
+      "id": "mac_studio_2025_newsroom",
+      "url": "https://www.apple.com/newsroom/2025/03/apple-unveils-new-mac-studio-the-most-powerful-mac-ever/",
+      "note": "Launch release documents M3 Ultra up to 512GB unified memory."
+    },
+    {
+      "id": "mac_mini_2023_support",
+      "url": "https://support.apple.com/en-us/111837",
+      "note": "Mac mini 2023 launch/technical configuration options."
+    },
+    {
+      "id": "mac_mini_2024_support",
+      "url": "https://support.apple.com/en-us/121555",
+      "note": "Mac mini 2024 launch/technical configuration options."
+    }
+  ],
+  "models": {
+    "macstudio": [
+      {
+        "generation": "2022",
+        "chip_family": "m1max",
+        "cpu_cores": [10],
+        "memory_gb": [32, 64],
+        "capacity_gb": [512, 1024, 2048, 4096, 8192],
+        "sources": ["mac_studio_2022_support"]
+      },
+      {
+        "generation": "2022",
+        "chip_family": "m1ultra",
+        "cpu_cores": [20],
+        "memory_gb": [64, 128],
+        "capacity_gb": [1024, 2048, 4096, 8192],
+        "sources": ["mac_studio_2022_support"]
+      },
+      {
+        "generation": "2023",
+        "chip_family": "m2max",
+        "cpu_cores": [12],
+        "memory_gb": [32, 64, 96],
+        "capacity_gb": [512, 1024, 2048, 4096, 8192],
+        "sources": ["mac_studio_2023_support"]
+      },
+      {
+        "generation": "2023",
+        "chip_family": "m2ultra",
+        "cpu_cores": [24],
+        "memory_gb": [64, 128, 192],
+        "capacity_gb": [1024, 2048, 4096, 8192],
+        "sources": ["mac_studio_2023_support"]
+      },
+      {
+        "generation": "2025",
+        "chip_family": "m4max",
+        "cpu_cores": [14, 16],
+        "memory_gb": [36, 48, 64, 128],
+        "capacity_gb": [512, 1024, 2048, 4096, 8192],
+        "sources": ["mac_studio_2025_support", "mac_studio_2025_newsroom"]
+      },
+      {
+        "generation": "2025",
+        "chip_family": "m3ultra",
+        "cpu_cores": [28, 32],
+        "memory_gb": [96, 256, 512],
+        "capacity_gb": [1024, 2048, 4096, 8192, 16384],
+        "sources": ["mac_studio_2025_support", "mac_studio_2025_newsroom"]
+      }
+    ],
+    "macmini": [
+      {
+        "generation": "2023",
+        "chip_family": "m2",
+        "cpu_cores": [8],
+        "memory_gb": [8, 16, 24],
+        "capacity_gb": [256, 512, 1024, 2048],
+        "sources": ["mac_mini_2023_support"]
+      },
+      {
+        "generation": "2023",
+        "chip_family": "m2pro",
+        "cpu_cores": [10, 12],
+        "memory_gb": [16, 32],
+        "capacity_gb": [512, 1024, 2048, 4096, 8192],
+        "sources": ["mac_mini_2023_support"]
+      },
+      {
+        "generation": "2024",
+        "chip_family": "m4",
+        "cpu_cores": [10],
+        "memory_gb": [16, 24, 32],
+        "capacity_gb": [256, 512, 1024, 2048],
+        "sources": ["mac_mini_2024_support"]
+      },
+      {
+        "generation": "2024",
+        "chip_family": "m4pro",
+        "cpu_cores": [12, 14],
+        "memory_gb": [24, 48, 64],
+        "capacity_gb": [512, 1024, 2048, 4096, 8192],
+        "sources": ["mac_mini_2024_support"]
+      }
+    ]
+  }
+}
